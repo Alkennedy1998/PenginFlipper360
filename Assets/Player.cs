@@ -2,6 +2,8 @@ using UnityEngine;
 using Normal.Realtime;
 
 public class Player : MonoBehaviour {
+
+    public float     maxSpeed = 10f;
     // Camera
     public  Transform  cameraTarget;
     private float     _mouseLookX;
@@ -13,8 +15,10 @@ public class Player : MonoBehaviour {
 
     private bool      _jumpThisFrame;
     private bool      _jumping;
-
+    private int       _avaliableJumps = 0;
+    private int       _maxJumps = 1;
     private Rigidbody _rigidbody;
+
 
     // Character
     [SerializeField] private Transform _character = default;
@@ -35,25 +39,22 @@ public class Player : MonoBehaviour {
 
     private void Start() {
         // Call LocalStart() only if this instance is owned by the local client
-        if (_realtimeView.isOwnedLocallyInHierarchy)
-            LocalStart();
+        if (_realtimeView.isOwnedLocallyInHierarchy) LocalStart();
     }
 
     private void Update() {
         // Call LocalUpdate() only if this instance is owned by the local client
-        if (_realtimeView.isOwnedLocallyInHierarchy)
-            LocalUpdate();
+        if (_realtimeView.isOwnedLocallyInHierarchy) LocalUpdate();
     }
 
     private void FixedUpdate() {
         // Call LocalFixedUpdate() only if this instance is owned by the local client
-        if (_realtimeView.isOwnedLocallyInHierarchy)
-            LocalFixedUpdate();
+        if (_realtimeView.isOwnedLocallyInHierarchy) LocalFixedUpdate();
     }
 
     private void LocalStart() {
         // Request ownership of the Player and the character RealtimeTransforms
-                   GetComponent<RealtimeTransform>().RequestOwnership();
+        GetComponent<RealtimeTransform>().RequestOwnership();
         _character.GetComponent<RealtimeTransform>().RequestOwnership();
     }
 
@@ -76,6 +77,11 @@ public class Player : MonoBehaviour {
         AnimateCharacter();
     }
 
+    private void OnCollisionEnter(Collision other) {
+        print("Collision detected. Avaliable Jumps =" + _avaliableJumps);
+        _avaliableJumps = _maxJumps;
+    }
+
     private void RotateCamera() {
         // Get the latest mouse movement. Multiple by 4.0 to increase sensitivity.
         _mouseLookX += Input.GetAxis("Mouse X") * 4.0f;
@@ -93,8 +99,8 @@ public class Player : MonoBehaviour {
     private void CalculateTargetMovement() {
         // Get input movement. Multiple by 6.0 to increase speed.
         Vector3 inputMovement = new Vector3();
-        inputMovement.x = Input.GetAxisRaw("Horizontal") * 6.0f;
-        inputMovement.z = Input.GetAxisRaw("Vertical")   * 6.0f;
+        inputMovement.x = Input.GetAxisRaw("Horizontal") * maxSpeed;
+        inputMovement.z = Input.GetAxisRaw("Vertical")   * maxSpeed;
 
         // Get the direction the camera is looking parallel to the ground plane.
         Vector3    cameraLookForwardVector = ProjectVectorOntoGroundPlane(cameraTarget.forward);
@@ -106,8 +112,13 @@ public class Player : MonoBehaviour {
 
     private void CheckForJump() {
         // Jump if the space bar was pressed this frame and we're not already jumping, trigger the jump
-        if (Input.GetKeyDown(KeyCode.Space) && !_jumping)
+        //TODO Ground player if they are toutching an collider
+
+
+        if (Input.GetKeyDown(KeyCode.Space) && _avaliableJumps>0){
             _jumpThisFrame = true;
+            _avaliableJumps -= 1;
+        }
     }
 
     private void MovePlayer() {
@@ -125,13 +136,9 @@ public class Player : MonoBehaviour {
             velocity.y = 6.0f;
 
             // Mark the player as currently jumping and clear the jump input
-            _jumping       = true;
             _jumpThisFrame = false;
         }
 
-        // Reset jump after the apex
-        if (_jumping && velocity.y < -0.1f)
-            _jumping = false;
 
         // Set the velocity on the rigidbody
         _rigidbody.velocity = velocity;
@@ -158,8 +165,9 @@ public class Player : MonoBehaviour {
 
         // Rotate to face the direction of travel if we're moving forward
         Vector3 targetCharacterLookForwardVector = characterLookForwardVector;
-        if (GetRigidbodyForwardVelocity(_rigidbody) >= 2.0f)
+        if (GetRigidbodyForwardVelocity(_rigidbody) >= 2.0f){
             targetCharacterLookForwardVector = _rigidbody.velocity.normalized;
+        }
 
         // Compose the target character rotation from the target look direction + target lean direction
         Quaternion targetRotation = Quaternion.LookRotation(targetCharacterLookForwardVector, leanRotation * Vector3.up);
