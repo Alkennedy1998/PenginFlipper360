@@ -48,6 +48,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 78daced515b09bc48bf5323976e5c81a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  maxSpeed: 10
   cameraTarget: {fileID: 8623071606489793527}
   _character: {fileID: 2264921598848131505}
 --- !u!54 &8623071604764880817
@@ -275,18 +276,6 @@ CapsuleCollider:
   m_Height: 1.0604011
   m_Direction: 1
   m_Center: {x: -0.026870519, y: 0.5231996, z: -0.013765931}
---- !u!114 &2966095917986700340
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5272354869905993666}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: cd1998abd50627d4ebe95ecfa6373184, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!136 &9095117630099749736
 CapsuleCollider:
   m_ObjectHideFlags: 0
@@ -301,3 +290,15 @@ CapsuleCollider:
   m_Height: 1.5587444
   m_Direction: 2
   m_Center: {x: 0.00010076165, y: 0.039448082, z: 0.0028374195}
+--- !u!114 &2966095917986700340
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5272354869905993666}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cd1998abd50627d4ebe95ecfa6373184, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 

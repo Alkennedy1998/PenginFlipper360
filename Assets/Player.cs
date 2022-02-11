@@ -72,13 +72,12 @@ public class Player : MonoBehaviour {
     private void LocalFixedUpdate() {
         // Move the player based on the input
         MovePlayer();
-
+        _rigidbody.AddForce(new Vector3(1f, 0f, 0f), ForceMode.Force);
         // Animate the character to match the player movement
         AnimateCharacter();
     }
 
     private void OnCollisionEnter(Collision other) {
-        print("Collision detected. Avaliable Jumps =" + _avaliableJumps);
         _avaliableJumps = _maxJumps;
     }
 
@@ -96,12 +95,13 @@ public class Player : MonoBehaviour {
         cameraTarget.localRotation = Quaternion.Euler(-_mouseLookY, _mouseLookX, 0.0f);
     }
 
+    private Vector3 inputMovement = new Vector3();
     private void CalculateTargetMovement() {
         // Get input movement. Multiple by 6.0 to increase speed.
-        Vector3 inputMovement = new Vector3();
         inputMovement.x = Input.GetAxisRaw("Horizontal") * maxSpeed;
         inputMovement.z = Input.GetAxisRaw("Vertical")   * maxSpeed;
-
+        print(maxSpeed);
+        print(inputMovement.x + " " + inputMovement.z);
         // Get the direction the camera is looking parallel to the ground plane.
         Vector3    cameraLookForwardVector = ProjectVectorOntoGroundPlane(cameraTarget.forward);
         Quaternion cameraLookForward       = Quaternion.LookRotation(cameraLookForwardVector);
@@ -111,11 +111,8 @@ public class Player : MonoBehaviour {
     }
 
     private void CheckForJump() {
-        // Jump if the space bar was pressed this frame and we're not already jumping, trigger the jump
-        //TODO Ground player if they are toutching an collider
-
-
-        if (Input.GetKeyDown(KeyCode.Space) && _avaliableJumps>0){
+        // Jump if the space bar was pressed this frame and there are jump left
+        if (Input.GetKeyDown(KeyCode.Space) && _avaliableJumps > 0){
             _jumpThisFrame = true;
             _avaliableJumps -= 1;
         }
@@ -177,7 +174,7 @@ public class Player : MonoBehaviour {
     }
 
     // Given a forward vector, get a y-axis rotation that points in the same direction that's parallel to the ground plane
-     private static Vector3 ProjectVectorOntoGroundPlane(Vector3 vector) {
+    private static Vector3 ProjectVectorOntoGroundPlane(Vector3 vector) {
         Vector3 planeNormal = Vector3.up;
         Vector3.OrthoNormalize(ref planeNormal, ref vector);
         return vector;
